@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .navbar {
+            background-color: #4CAF50; /* Cor da navbar */
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 50px; /* Altura fixa da navbar */
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navbar .logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .navbar a {
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+            border-radius: 4px;
+        }
+
+        label {
+            font-size: 16px;
+            color: #555;
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50; /* Cor do botão igual à navbar */
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049; /* Cor do botão ao passar o mouse */
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 60vh;
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: auto;
+            margin-top: 100px;
+        }
+        .qrcode {
+            text-align: center;
+        }
+        .qrcode img {
+            max-width: 300px; /* Tamanho máximo do QR Code */
+            height: auto;
+        }
+
+        button,
+        #download-button { /* Estilo aplicado para ambos os botões */
+            padding: 10px 15px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50; /* Cor do botão igual à navbar */
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none; /* Remover sublinhado do link */
+            text-align: center; /* Centralizar texto */
+            display: inline-block; /* Exibir como bloco inline */
+        }
+        button:hover,
+        #download-button:hover { /* Efeito de hover para ambos os botões */
+            background-color: #45a049;
+        }
+
+        #download-button {
+            display: none; /* Escondido até que o QR Code seja gerado */
+            margin-top: 20px;
+            
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">Encurta.ai</div>
+        <div>
+            <a href="#reverter-link">Reverter Link</a>
+            <a href="./index.html">Home</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="qrcode">
+            <label for="input-text">Gerador QR Code:</label>
+            <div class="input-container">
+                <input type="text" id="input-text" placeholder="Digite seu texto aqui...">
+                <button id="gerar">Gerar</button>
+            </div>
+            <h2>Seu QR Code</h2>
+            <img src="#" alt="QR Code" id="myImg">
+            <!-- Botão de download, inicialmente escondido -->
+            <a id="download-button" download="qrcode.png">Baixar QR Code</a>
+        </div>
+    </div>
+
+    <script >
+        document.getElementById("gerar").onclick = async function(){
+        var input = document.getElementById("input-text").value;
+
+        if(input == "" || input == null){
+            return
+        }
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/QRcode/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ link: input })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Erro ao gerar QR Code');
+            }
+
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            document.getElementById('myImg').src = url;
+
+
+
+             // Configurar o botão de download
+            const downloadButton = document.getElementById('download-button');
+            downloadButton.href = url;
+            downloadButton.style.display = 'block'; // Mostrar o botão de download
+        } catch (error) {
+            console.error('Erro:', error);
+        }
+}
+    </script>
+
+
+</body>
+</html>
